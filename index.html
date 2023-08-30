@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .bg-image {
+      background-image: url('sua-imagem-em-azul.jpg');
+      background-size: cover;
+    }
+  </style>
+  <title>Formulário de Inscrição</title>
+</head>
+<body class="bg-image flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h2 class="text-2xl mb-4">Formulário de Inscrição</h2>
+    <form id="formStep1" action="https://api.sheetmonkey.io/form/9zNZmctLrePe8VgfswcLka" method="post">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
+        <input type="text" name="empresa" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">CNPJ</label>
+        <input type="text" name="cnpj" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Quantidade de Inscritos</label>
+        <input type="number" name="quantidade" id="quantidade" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+      </div>
+      <div id="step2" class="hidden">
+        <h3 class="text-lg font-medium mb-2">Dados dos Inscritos</h3>
+        <div id="inscritosFields"></div>
+      </div>
+      <input type="hidden" id="quantidadeHidden" name="quantidadeHidden">
+      <button id="nextButton" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Próximo</button>
+      <button id="submitButton" class="hidden bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Enviar</button>
+    </form>
+  </div>
+
+  <script>
+    const nextButton = document.getElementById('nextButton');
+    const submitButton = document.getElementById('submitButton');
+    const step2 = document.getElementById('step2');
+    const inscritosFields = document.getElementById('inscritosFields');
+    const quantidadeInput = document.getElementById('quantidade');
+    const quantidadeHidden = document.getElementById('quantidadeHidden');
+
+    nextButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      step2.classList.remove('hidden');
+      nextButton.classList.add('hidden');
+      submitButton.classList.remove('hidden');
+      quantidadeHidden.value = quantidadeInput.value;
+      renderInscritosFields();
+    });
+
+    function renderInscritosFields() {
+      const quantidade = parseInt(quantidadeInput.value);
+      inscritosFields.innerHTML = '';
+
+      for (let i = 1; i <= quantidade; i++) {
+        const inscritoFields = document.createElement('div');
+        inscritoFields.innerHTML = `
+          <h4 class="text-md font-medium mb-2">Inscrito ${i}</h4>
+          <label class="block text-sm font-medium text-gray-700">Nome</label>
+          <input type="text" name="nome${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" name="email${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+          <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
+          <input type="text" name="whatsapp${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+          <label class="block text-sm font-medium text-gray-700">CPF</label>
+          <input type="text" name="cpf${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
+        `;
+        inscritosFields.appendChild(inscritoFields);
+      }
+    }
+  </script>
+</body>
+</html>
