@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/main.css">
-  
   <title>Formulário de Inscrição</title>
 </head>
 <body class="bg-image flex items-center justify-center h-screen">
   <div class="p-8 rounded-lg shadow-md w-96 border-2 border-blue-200">
     <h2 class="text-2xl mb-4 font-bold">Formulário de Inscrição</h2>
-    <form id="formStep1" action="https://api.sheetmonkey.io/form/9zNZmctLrePe8VgfswcLka" method="post" target="_blank" >
+    <form id="formStep1" action="https://api.sheetmonkey.io/form/bVAfZidHLq8FZjJTxaEuar" method="post" target="_blank">
       <div id="step1">
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
@@ -24,10 +23,10 @@
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700">Curso</label>
           <select name="curso" class="mt-1 p-2 w-full rounded-md border border-gray-300">
-              <option value="curso1">Curso Gestão Tributária de Contratos e Convênios</option>
-              <option value="curso2">Curso EFD-REINF e DCTFWeb</option>
-              <option value="curso3">Curso Imersão em retenções Tributárias</option>
-              <!-- Adicione mais opções de cursos conforme necessário -->
+            <option value="curso1">Curso Gestão Tributária de Contratos e Convênios</option>
+            <option value="curso2">Curso EFD-REINF e DCTFWeb</option>
+            <option value="curso3">Curso Imersão em retenções Tributárias</option>
+            <!-- Adicione mais opções de cursos conforme necessário -->
           </select>
         </div>
         <div class="mb-4">
@@ -58,10 +57,11 @@
     const inscritosFields = document.getElementById('inscritosFields');
     const quantidadeInput = document.getElementById('quantidade');
     const quantidadeHidden = document.getElementById('quantidadeHidden');
-
+  
     let currentStep = 1;
     let inscritoStep = 1;
-
+    let inscritosData = [];
+  
     nextButton.addEventListener('click', function(event) {
       event.preventDefault();
       step1.classList.add('hidden');
@@ -70,18 +70,35 @@
       quantidadeHidden.value = quantidadeInput.value;
       renderInscritosFields();
     });
-
+  
     nextButton2.addEventListener('click', function(event) {
       event.preventDefault();
-      if (inscritoStep < parseInt(quantidadeInput.value)) {
-        inscritoStep++;
-        renderInscritosFields();
-      } else {
-        submitButton.classList.remove('hidden');
+      if (inscritoStep <= parseInt(quantidadeInput.value)) {
+        const nome = document.querySelector(`input[name=nome${inscritoStep}]`).value;
+        const email = document.querySelector(`input[name=email${inscritoStep}]`).value;
+        const whatsapp = document.querySelector(`input[name=whatsapp${inscritoStep}]`).value;
+        const cpf = document.querySelector(`input[name=cpf${inscritoStep}]`).value;
+  
+        const inscrito = {
+          nome,
+          email,
+          whatsapp,
+          cpf
+        };
+  
+        inscritosData.push(inscrito);
+  
+        if (inscritoStep === parseInt(quantidadeInput.value)) {
+          submitButton.classList.remove('hidden');
+        } else {
+          inscritoStep++;
+          renderInscritosFields();
+        }
+  
+        currentStep++;
       }
-      currentStep++;
     });
-
+  
     prevButton.addEventListener('click', function(event) {
       event.preventDefault();
       if (inscritoStep > 1) {
@@ -93,60 +110,54 @@
       }
       currentStep--;
     });
-
+  
     submitButton.addEventListener('click', async function(event) {
       event.preventDefault();
+  
       const quantidade = parseInt(quantidadeInput.value);
-
-      for (let i = 1; i <= quantidade; i++) {
-        const nome = document.querySelector(`input[name=nome${i}]`).value;
-        const email = document.querySelector(`input[name=email${i}]`).value;
-        const whatsapp = document.querySelector(`input[name=whatsapp${i}]`).value;
-        const cpf = document.querySelector(`input[name=cpf${i}]`).value;
-
+  
+      for (let i = 0; i < quantidade; i++) {
         const dados = {
           empresa: document.querySelector('input[name=empresa]').value,
           cnpj: document.querySelector('input[name=cnpj]').value,
           curso: document.querySelector('select[name=curso]').value,
-          nome,
-          email,
-          whatsapp,
-          cpf
+          ...inscritosData[i] // Adiciona os dados do inscrito
         };
-
+  
         // Faça a solicitação POST para a API
         await enviarParaAPI(dados);
       }
-
+  
       alert('Inscrições enviadas!');
     });
-
+  
     function renderInscritosFields() {
       const quantidade = parseInt(quantidadeInput.value);
       inscritosFields.innerHTML = '';
-
+  
       for (let i = 1; i <= quantidade; i++) {
         const inscritoFields = document.createElement('div');
-        if (i === inscritoStep) {
-          inscritoFields.innerHTML = `
-            <h4 class="text-md font-medium mb-2">Inscrito ${i}</h4>
-            <label class="block text-sm font-medium text-gray-700">Nome</label>
-            <input type="text" name="nome${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
-            <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
-            <input type="text" name="whatsapp${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
-            <label class="block text-sm font-medium text-gray-700">CPF</label>
-            <input type="text" name="cpf${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300">
-          `;
+        inscritoFields.innerHTML = `
+          <h4 class="text-md font-medium mb-2">Inscrito ${i}</h4>
+          <label class="block text-sm font-medium text-gray-700">Nome</label>
+          <input type="text" name="nome${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300" value="">
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" name="email${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300" value="">
+          <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
+          <input type="text" name="whatsapp${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300" value="">
+          <label class="block text-sm font-medium text-gray-700">CPF</label>
+          <input type="text" name="cpf${i}" class="mt-1 p-2 w-full rounded-md border border-gray-300" value="">
+        `;
+        if (i !== inscritoStep) {
+          inscritoFields.style.display = 'none';
         }
         inscritosFields.appendChild(inscritoFields);
       }
     }
-
+  
     async function enviarParaAPI(data) {
-      const apiUrl = 'https://api.sheetmonkey.io/form/9zNZmctLrePe8VgfswcLka'; // URL da API
-
+      const apiUrl = 'https://api.sheetmonkey.io/form/bVAfZidHLq8FZjJTxaEuar'; // URL da API
+  
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -154,7 +165,7 @@
         },
         body: JSON.stringify(data)
       });
-
+  
       if (response.ok) {
         console.log('Enviado com sucesso:', data);
       } else {
